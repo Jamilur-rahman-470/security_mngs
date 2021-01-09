@@ -31,7 +31,7 @@ Route::post('/assign-training', [App\Http\Controllers\TrainController::class, 's
 Route::get('/demand', [App\Http\Controllers\DemandController::class, 'index'])->middleware('auth')->name('demand');
 Route::post('/demand', [App\Http\Controllers\DemandController::class, 'store'])->middleware('auth')->name('demand_post');
 
-Route::post('/client-pay/{amount}/{type}', [App\Http\Controllers\TransactionController::class, 'store'])->middleware('auth')->name('client_pay');
+Route::post('/client-pay/{amount}/{type}/{id}', [App\Http\Controllers\TransactionController::class, 'store'])->middleware('auth')->name('client_pay');
 Route::post('/salary-pay', [App\Http\Controllers\TransactionController::class, 'pay_salary'])->middleware('auth')->name('salary_pay');
 
 Route::get('/demnads', [App\Http\Controllers\DemandController::class, 'views'])->middleware('auth')->name('demands');

@@ -37,10 +37,14 @@
                     <p>Education - {{ $profile->education }}</p>
                     <p>Previous Job - {{ $profile->previous_job }}</p>
                     <p>Physical Quality - {{ $profile->physical_qual }}</p>
-                    <form action="{{ route('client_pay', ['amount' => 3500, 'type' => 'p']) }}" method="post">
-                        @csrf
-                        <input type="submit" value="PAY APP FEE" class="btn btn-primary w-100">
-                    </form>
+
+                    @if ($profile->is_paid === '0')
+                        <form action="{{ route('client_pay', ['amount' => 3500, 'type' => 'p', 'id' => 1]) }}"
+                            method="post">
+                            @csrf
+                            <input type="submit" value="PAY APP FEE" class="btn btn-primary w-100">
+                        </form>
+                    @endif
                 </div>
             @endif
             @if ($user->type === 'participator' && empty($profile))
@@ -48,7 +52,7 @@
                     <form action="{{ route('par-profile') }}" method="POST">
                         @csrf
                         <h4>Complete Profile</h4>
-                        <div class="form-group">
+                        {{-- <div class="form-group">
                             <label for="">BRANCH</label>
                             <select name="branch" id="" class="form-control">
                                 @php
@@ -60,7 +64,7 @@
                                     @endforeach
                                 @endif
                             </select>
-                        </div>
+                        </div> --}}
                         <div class="form-group">
                             <label for="">Education</label>
                             <input type="text" class="form-control" name='education'>
@@ -86,6 +90,18 @@
                 </div>
             @endif
             @include('partials.user-actions')
+            @if ($user->type === 'employee' && !empty($profile))
+                <div class="card p-2">
+                    @php
+                    $income = DB::table('transactions')->sum('income');
+                    $exp = DB::table('transactions')->sum('expenditure');
+                    $profit = $income - $exp;
+                    @endphp
+                    <p>Income - {{ $income }}</p>
+                    <p>Expenditure - {{ $exp }}</p>
+                    <p>Profit - {{ $profit }}</p>
+                </div>
+            @endif
         </div>
         <br>
         <br>
@@ -94,28 +110,27 @@
             $demand = DB::table('demands')->where('c_reg_id', auth()->id())->get();
             @endphp
             @if (!empty($demand))
-                @foreach ($demand as $item)
-                    <div class="card p-2" style="width: 300px;">
-                        <p>EMP id - {{ $item->emp_reg_id }}</p>
-                        <p>Amount requested - {{ $item->amount }}</p>
-                        <form action="{{ route('client_pay', ['amount' => $item->amount, 'type' => 'c']) }}" method="POST">
-                            @csrf
-                            <input type="submit" value="Make Payment" class="btn btn-primary w-100">
-                        </form>
-                    </div>
-                @endforeach
+                <div class="row">
+                    @foreach ($demand as $item)
+                        <div class="col-md m-1">
+                            <div class="card p-2" style="width: 300px;">
+                                <p>EMP id - {{ $item->emp_reg_id }}</p>
+                                <p>Amount to be paid - {{ $item->amount }}</p>
+                                @if ($item->is_paid === '0')
+                                    <form
+                                        action="{{ route('client_pay', ['amount' => $item->amount, 'type' => 'c', 'id' => $item->id]) }}"
+                                        method="POST">
+                                        @csrf
+                                        <input type="submit" value="Make Payment" class="btn btn-primary w-100">
+                                    </form>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             @endif
         @endif
 
-        @if ($user->type === 'employee' && !empty($profile))
-            @php
-            $income = DB::table('transactions')->sum('income');
-            $exp = DB::table('transactions')->sum('expenditure');
-            $profit = $income - $exp;
-            @endphp
-            <p>Income - {{ $income }}</p>
-            <p>Expenditure - {{ $exp }}</p>
-            <p>Profit - {{ $profit }}</p>
-        @endif
+
     </div>
 @endsection

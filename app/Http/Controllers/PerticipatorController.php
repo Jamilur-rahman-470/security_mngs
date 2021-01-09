@@ -16,7 +16,7 @@ class PerticipatorController extends Controller
         $perr->reg_id = auth()->id();
         $perr->serial_no = Str::uuid();
         $perr->app_fee = 2500;
-        $perr->branch = request('branch');
+        $perr->branch = ' ';
         $perr->education = request('education');
         $perr->previous_job = request('previous_job');
         $perr->physical_qual = request('physical_qual');
